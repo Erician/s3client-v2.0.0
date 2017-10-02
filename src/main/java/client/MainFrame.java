@@ -4,8 +4,12 @@ import static run.DialogRun.run;
 import static run.FrameRun.run;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Label;
+import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -22,6 +26,8 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
 
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -34,6 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
+import javax.swing.border.Border;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -63,19 +70,33 @@ public class MainFrame extends JFrame implements Runnable{
 	
 	private JMenuBar 
 		jmb = new JMenuBar();
+	
 	private JMenu 
 		fileMenu = new JMenu("File"),
+		editMenu = new JMenu("Edit"),
+		synchMenu = new JMenu("Synch"),
 		helpMenu = new JMenu("Help");
+	//fileMenu's items
 	private JMenuItem
-		accountMenuItem= new JMenuItem("Account"),
-		synMenuItem = new JMenuItem("synchronization"),
+		addAnAccountItem= new JMenuItem("Add an Account"),
+		editAccountsItem = new JMenuItem("Edit Accounts"),
+		switchAccountItem = new JMenuItem("Switch Account"),
 		exitMenuItem = new JMenuItem("Exit");
+	//editMenu's items
 	
+	//synchMenu's items
+	private JMenuItem
+		addAFolderItem = new JMenuItem("Add a Folder"),
+		editFoldersItem = new JMenuItem("Edit Folders");
+	//helpMenu's items
 	private JMenuItem
 		aboutS3ClientMenuItem = new JMenuItem("About S3Client");
 	
+	
+	
 	private JPanel
-		mainPanel = new JPanel();
+		mainPanel = new JPanel(),
+		pathAndSearchPanel = new JPanel(true);
 	
 	private DefaultMutableTreeNode 
 		root = new DefaultMutableTreeNode("buckets");
@@ -96,6 +117,7 @@ public class MainFrame extends JFrame implements Runnable{
 		currentDirectoryLabel = new CurrentDirectoryLabel();
 	
 	private JButton
+		backButton = new JButton(""),
 		uploadButton = new JButton("Upload"),
 		newFolderButton = new JButton("NewFolder"),
 		downloadButton = new JButton("Download"),
@@ -134,12 +156,19 @@ public class MainFrame extends JFrame implements Runnable{
 		setLayout(null);
 		mainPanel.setLayout(null);
 		setComponentPositionAndAttribute();
-		fileMenu.add(accountMenuItem);
-		fileMenu.add(synMenuItem);
+		fileMenu.add(addAnAccountItem);
+		fileMenu.add(editAccountsItem);
+		fileMenu.add(switchAccountItem);
 		fileMenu.add(exitMenuItem);
 		
+		synchMenu.add(addAFolderItem);
+		synchMenu.add(editFoldersItem);
+		
 		helpMenu.add(aboutS3ClientMenuItem);
+		
 		jmb.add(fileMenu);
+		jmb.add(editMenu);
+		jmb.add(synchMenu);
 		jmb.add(helpMenu);
 		setJMenuBar(jmb);
 		//
@@ -157,6 +186,10 @@ public class MainFrame extends JFrame implements Runnable{
 		mainPanel.add(tabbedPane);
 		//
 		mainPanel.add(currentDirectoryLabel);
+		
+		//pathAndSearchPanel
+		pathAndSearchPanel.add(backButton);
+		add(pathAndSearchPanel);
 		add(mainPanel);
 		//程序打开时进行初始化
 		init();
@@ -178,7 +211,8 @@ public class MainFrame extends JFrame implements Runnable{
 		int sw = getWidth();
 		int sh = getHeight();
 		
-		mainPanel.setBounds(0, 0, sw, sh);
+		mainPanel.setBounds(0, 40, sw, sh);
+		pathAndSearchPanel.setBounds(0,0,sw,40);
 		bucketTreeScrollPane.setBounds(0, 0, sw/5, sh/8*5);
 		objectTableScrollPane.setBounds(sw/5, 0, sw-sw/5-10-10, sh/8*5-50);
 		currentDirectoryLabel.setBounds(0, sh-110, sw, 28);
@@ -239,8 +273,8 @@ public class MainFrame extends JFrame implements Runnable{
 		this.addComponentListener(new MainFrameComponentListener());
 		this.addWindowListener(new MainFrameWindowListener());
 		this.addWindowStateListener(new MainFrameWindowStateListener());
-		accountMenuItem.addActionListener(new AccountMenuItemListener());
-		synMenuItem.addActionListener(new SynMenuItemListener());
+		//accountMenuItem.addActionListener(new AccountMenuItemListener());
+		//synMenuItem.addActionListener(new SynMenuItemListener());
 		exitMenuItem.addActionListener(new ExitMenuItemListener());
 		
 		uploadButton.addActionListener(new UploadActionListener());
@@ -248,7 +282,6 @@ public class MainFrame extends JFrame implements Runnable{
 		deleteButton.addActionListener(new DeleteActionListener());
 		downloadButton.addActionListener(new DownLoadActionListener());
 		
-
 		//
 		uploadButton.setFocusPainted(false);
 		newFolderButton.setFocusPainted(false);
@@ -263,9 +296,21 @@ public class MainFrame extends JFrame implements Runnable{
 		deleteButton.setFocusable(false);
 		freshButton.setFocusable(false);
 		
+		//border
+		Border border = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(0x828790));
+		pathAndSearchPanel.setBorder(border);
+		
 		//color
+		jmb.setBackground(new Color(0xF2F2F2));
+		pathAndSearchPanel.setBackground(new Color(0xF2F2F2));
+		
 		mainPanel.setBackground(Color.WHITE);
 		objectTableScrollPane.getViewport().setBackground(Color.WHITE);
+		//picture
+		backButton.setIcon(new ImageIcon("resources\\pictures\back.png"));
+		
+		
+		
 	}
 	private void init() throws IOException {
 		//先读取文件
