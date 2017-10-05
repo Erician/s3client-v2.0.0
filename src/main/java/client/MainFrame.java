@@ -225,7 +225,9 @@ public class MainFrame extends JFrame implements Runnable{
 		//先在我的机器上测试一下图片
 		backButton.setBounds(Math.round(9*widthFactor), Math.round(9*heightFactor), 
 				Math.round(32*widthFactor), Math.round(32*heightFactor));
-		forwardButton.setBounds(Math.round(50*widthFactor), Math.round(9*heightFactor)+1, 
+		//像素的简单调整
+		forwardButton.setBounds(Math.round(45*widthFactor), 
+				ScreenInfo.getScreenWidth()>=1900?Math.round(9*heightFactor)+1:Math.round(9*heightFactor), 
 				Math.round(32*widthFactor), Math.round(32*heightFactor));
 		
 		
@@ -303,19 +305,23 @@ public class MainFrame extends JFrame implements Runnable{
 		backButton.addMouseListener(new backButtonMouseListener());
 		forwardButton.addMouseListener(new forwardButtonMouseListener());
 		
-		//
+		//focus painted
 		uploadButton.setFocusPainted(false);
 		newFolderButton.setFocusPainted(false);
 		downloadButton.setFocusPainted(false);
 		deleteButton.setFocusPainted(false);
 		freshButton.setFocusPainted(false);
+		backButton.setFocusPainted(false);
+		forwardButton.setFocusPainted(false);
 		
-		//
+		//focusable
 		uploadButton.setFocusable(false);
 		newFolderButton.setFocusable(false);
 		downloadButton.setFocusable(false);
 		deleteButton.setFocusable(false);
 		freshButton.setFocusable(false);
+		backButton.setFocusable(false);
+		forwardButton.setFocusable(false);
 		
 		//border
 		Border border = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(0x828790));
