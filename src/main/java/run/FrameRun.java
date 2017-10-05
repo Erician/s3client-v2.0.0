@@ -9,12 +9,14 @@ public class FrameRun {
 			
 			public void run() {
 				// TODO Auto-generated method stub
+				
 				try{
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 				}
 				catch(Exception e){
 					throw new RuntimeException(e);
 				}
+				
 				
 				f.setTitle(f.getClass().getSimpleName());
 				f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

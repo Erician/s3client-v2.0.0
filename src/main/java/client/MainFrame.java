@@ -189,6 +189,7 @@ public class MainFrame extends JFrame implements Runnable{
 		
 		//pathAndSearchPanel
 		pathAndSearchPanel.add(backButton);
+		
 		add(pathAndSearchPanel);
 		add(mainPanel);
 		//程序打开时进行初始化
@@ -211,8 +212,14 @@ public class MainFrame extends JFrame implements Runnable{
 		int sw = getWidth();
 		int sh = getHeight();
 		
-		mainPanel.setBounds(0, 40, sw, sh);
-		pathAndSearchPanel.setBounds(0,0,sw,40);
+		
+		
+		pathAndSearchPanel.setBounds(0,0,sw,Math.round(50*ScreenInfo.getHeightFactor()));
+		//先在我的机器上测试一下图片
+		backButton.setBounds(6, 6, 22, 22);
+		
+		mainPanel.setBounds(0, Math.round(50*ScreenInfo.getHeightFactor()), sw, sh);
+		
 		bucketTreeScrollPane.setBounds(0, 0, sw/5, sh/8*5);
 		objectTableScrollPane.setBounds(sw/5, 0, sw-sw/5-10-10, sh/8*5-50);
 		currentDirectoryLabel.setBounds(0, sh-110, sw, 28);
@@ -299,6 +306,7 @@ public class MainFrame extends JFrame implements Runnable{
 		//border
 		Border border = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(0x828790));
 		pathAndSearchPanel.setBorder(border);
+		backButton.setBorderPainted(false);
 		
 		//color
 		jmb.setBackground(new Color(0xF2F2F2));
@@ -307,7 +315,7 @@ public class MainFrame extends JFrame implements Runnable{
 		mainPanel.setBackground(Color.WHITE);
 		objectTableScrollPane.getViewport().setBackground(Color.WHITE);
 		//picture
-		backButton.setIcon(new ImageIcon("resources\\pictures\back.png"));
+		backButton.setIcon(new ImageIcon("src/main/resources/pictures/back22-22.png"));
 		
 		
 		
@@ -714,7 +722,7 @@ public class MainFrame extends JFrame implements Runnable{
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			run.FrameRun.run(this,1200,800);
+			run.FrameRun.run(this,Math.round(1300*ScreenInfo.getWidthFactor()),Math.round(850*ScreenInfo.getHeightFactor()));
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

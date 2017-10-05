@@ -25,8 +25,9 @@ public class App {
 	
 	public static void main(String[] args) throws IOException {
 		
+		
 		final int SIZE = 1;
-		InitGlobalFont(new Font("TimesRoman", Font.PLAIN, 18)); 
+		InitGlobalFont(new Font("TimesRoman", Font.PLAIN, (int) Math.floor(18*ScreenInfo.getHeightFactor()))); 
 		//
 		//countDownLatch这个用于关闭该主窗口时，通知线程池关闭
 		CountDownLatch countDownLatch = new CountDownLatch(SIZE);
