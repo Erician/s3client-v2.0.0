@@ -15,6 +15,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.io.File;
@@ -118,6 +121,7 @@ public class MainFrame extends JFrame implements Runnable{
 	
 	private JButton
 		backButton = new JButton(""),
+		forwardButton = new JButton(""),
 		uploadButton = new JButton("Upload"),
 		newFolderButton = new JButton("NewFolder"),
 		downloadButton = new JButton("Download"),
@@ -189,6 +193,7 @@ public class MainFrame extends JFrame implements Runnable{
 		
 		//pathAndSearchPanel
 		pathAndSearchPanel.add(backButton);
+		pathAndSearchPanel.add(forwardButton);
 		
 		add(pathAndSearchPanel);
 		add(mainPanel);
@@ -213,12 +218,18 @@ public class MainFrame extends JFrame implements Runnable{
 		int sh = getHeight();
 		
 		
+		float heightFactor = ScreenInfo.getHeightFactor();
+		float widthFactor = ScreenInfo.getWidthFactor();
 		
-		pathAndSearchPanel.setBounds(0,0,sw,Math.round(50*ScreenInfo.getHeightFactor()));
+		pathAndSearchPanel.setBounds(0,0,sw,Math.round(50*heightFactor));
 		//先在我的机器上测试一下图片
-		backButton.setBounds(6, 6, 22, 22);
+		backButton.setBounds(Math.round(9*widthFactor), Math.round(9*heightFactor), 
+				Math.round(32*widthFactor), Math.round(32*heightFactor));
+		forwardButton.setBounds(Math.round(50*widthFactor), Math.round(9*heightFactor)+1, 
+				Math.round(32*widthFactor), Math.round(32*heightFactor));
 		
-		mainPanel.setBounds(0, Math.round(50*ScreenInfo.getHeightFactor()), sw, sh);
+		
+		mainPanel.setBounds(0, Math.round(50*heightFactor), sw, sh);
 		
 		bucketTreeScrollPane.setBounds(0, 0, sw/5, sh/8*5);
 		objectTableScrollPane.setBounds(sw/5, 0, sw-sw/5-10-10, sh/8*5-50);
@@ -289,6 +300,9 @@ public class MainFrame extends JFrame implements Runnable{
 		deleteButton.addActionListener(new DeleteActionListener());
 		downloadButton.addActionListener(new DownLoadActionListener());
 		
+		backButton.addMouseListener(new backButtonMouseListener());
+		forwardButton.addMouseListener(new forwardButtonMouseListener());
+		
 		//
 		uploadButton.setFocusPainted(false);
 		newFolderButton.setFocusPainted(false);
@@ -307,17 +321,25 @@ public class MainFrame extends JFrame implements Runnable{
 		Border border = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(0x828790));
 		pathAndSearchPanel.setBorder(border);
 		backButton.setBorderPainted(false);
+		forwardButton.setBorderPainted(false);
 		
 		//color
 		jmb.setBackground(new Color(0xF2F2F2));
 		pathAndSearchPanel.setBackground(new Color(0xF2F2F2));
+		backButton.setBackground(new Color(0xF2F2F2));
+		forwardButton.setBackground(new Color(0xF2F2F2));
 		
 		mainPanel.setBackground(Color.WHITE);
 		objectTableScrollPane.getViewport().setBackground(Color.WHITE);
 		//picture
-		backButton.setIcon(new ImageIcon("src/main/resources/pictures/back22-22.png"));
-		
-		
+		if(ScreenInfo.getScreenWidth()>=1900) {
+			backButton.setIcon(new ImageIcon("src/main/resources/pictures/back32-32.png"));
+			forwardButton.setIcon(new ImageIcon("src/main/resources/pictures/forward32-32.png"));
+		}
+		else {
+			backButton.setIcon(new ImageIcon("src/main/resources/pictures/back22-22.png"));
+			forwardButton.setIcon(new ImageIcon("src/main/resources/pictures/forward22-22.png"));
+		}
 		
 	}
 	private void init() throws IOException {
@@ -431,6 +453,63 @@ public class MainFrame extends JFrame implements Runnable{
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private class backButtonMouseListener implements MouseListener{
+
+		public void mouseClicked(MouseEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("back");
+		}
+
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			backButton.setBackground(new Color(0xDFDFDF));
+		}
+
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			backButton.setBackground(new Color(0xF2F2F2));
+		}
+
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+	private class forwardButtonMouseListener implements MouseListener{
+
+		public void mouseClicked(MouseEvent e) {
+			// TODO Auto-generated method stub
+			System.out.println("forward");
+		}
+
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			forwardButton.setBackground(new Color(0xDFDFDF));
+		}
+
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			forwardButton.setBackground(new Color(0xF2F2F2));
+		}
+
+		public void mousePressed(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void mouseReleased(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 	
 	private class UploadActionListener implements ActionListener{
