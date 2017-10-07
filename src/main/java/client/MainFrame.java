@@ -8,8 +8,10 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.Label;
 import java.awt.LayoutManager;
+import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -42,8 +44,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.border.MatteBorder;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -95,8 +101,6 @@ public class MainFrame extends JFrame implements Runnable{
 	private JMenuItem
 		aboutS3ClientMenuItem = new JMenuItem("About S3Client");
 	
-	
-	
 	private JPanel
 		mainPanel = new JPanel(),
 		pathAndSearchPanel = new JPanel(true);
@@ -127,6 +131,12 @@ public class MainFrame extends JFrame implements Runnable{
 		downloadButton = new JButton("Download"),
 		deleteButton = new JButton("Delete"), 
 		freshButton = new JButton("Fresh");
+	
+	//目录
+	private Border border = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(0xA9A9A9));
+	private JTextField editableDirectory = new JTextField();
+	
+	
 	//task is useless,just for init
 	private TaskTextArea
 		taskTextArea = new TaskTextArea();
@@ -145,6 +155,7 @@ public class MainFrame extends JFrame implements Runnable{
 	//只有账户正确时，才可以将isSynDirok设为true
 	private boolean isAccountOk = false;
 	
+	private DirectoryButtons directoryButtons = new DirectoryButtons(pathAndSearchPanel);
 	
 	public MainFrame(CountDownLatch latch,CurDirData curDirData,
 			ListObjectInDirectoryData listObjectInDirectoryData, ObjectTable objectTable
@@ -155,10 +166,12 @@ public class MainFrame extends JFrame implements Runnable{
 		this.listObjectInDirectoryData = listObjectInDirectoryData;
 		this.objectTable = objectTable;
 		
+		
 		objectTableScrollPane = new JScrollPane(objectTable);
 		
 		setLayout(null);
 		mainPanel.setLayout(null);
+		pathAndSearchPanel.setLayout(null);
 		setComponentPositionAndAttribute();
 		fileMenu.add(addAnAccountItem);
 		fileMenu.add(editAccountsItem);
@@ -194,6 +207,9 @@ public class MainFrame extends JFrame implements Runnable{
 		//pathAndSearchPanel
 		pathAndSearchPanel.add(backButton);
 		pathAndSearchPanel.add(forwardButton);
+
+		//pathAndSearchPanel.add(uploadButton);
+		//pathAndSearchPanel.add(editableDirectory);
 		
 		add(pathAndSearchPanel);
 		add(mainPanel);
@@ -217,19 +233,22 @@ public class MainFrame extends JFrame implements Runnable{
 		int sw = getWidth();
 		int sh = getHeight();
 		
-		
 		float heightFactor = ScreenInfo.getHeightFactor();
 		float widthFactor = ScreenInfo.getWidthFactor();
 		
 		pathAndSearchPanel.setBounds(0,0,sw,Math.round(50*heightFactor));
-		//先在我的机器上测试一下图片
+		
 		backButton.setBounds(Math.round(9*widthFactor), Math.round(9*heightFactor), 
 				Math.round(32*widthFactor), Math.round(32*heightFactor));
 		//像素的简单调整
 		forwardButton.setBounds(Math.round(45*widthFactor), 
 				ScreenInfo.getScreenWidth()>=1900?Math.round(9*heightFactor)+1:Math.round(9*heightFactor), 
 				Math.round(32*widthFactor), Math.round(32*heightFactor));
+		//directory button
+		directoryButtons.setBound(sw);
 		
+		editableDirectory.setBounds(Math.round(85*widthFactor), Math.round(9*heightFactor),
+				sw*3/5,  Math.round(32*heightFactor));
 		
 		mainPanel.setBounds(0, Math.round(50*heightFactor), sw, sh);
 		
@@ -245,8 +264,12 @@ public class MainFrame extends JFrame implements Runnable{
 		
 		tabbedPane.setBounds(0,sh/8*5,sw-20,sh/8*3-110);
 		
+		//
+		
 		bucketTreeScrollPane.updateUI();
 		objectTableScrollPane.updateUI();
+		
+		
 	}
 	class MainFrameComponentListener implements ComponentListener{
 		public void componentShown(ComponentEvent state) {
@@ -323,11 +346,25 @@ public class MainFrame extends JFrame implements Runnable{
 		backButton.setFocusable(false);
 		forwardButton.setFocusable(false);
 		
+		
 		//border
-		Border border = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(0x828790));
-		pathAndSearchPanel.setBorder(border);
+		Border border1 = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(0xA9A9A9));
+		pathAndSearchPanel.setBorder(border1);
+		Border border2 = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(0xA9A9A9));
+		editableDirectory.setBorder(border2);
+		editableDirectory.setFont(new Font("TimesRoman", Font.PLAIN, (int) Math.floor(19*ScreenInfo.getHeightFactor())));
+		
+		
 		backButton.setBorderPainted(false);
 		forwardButton.setBorderPainted(false);
+		
+		//scroll bar
+		editableDirectory.setAutoscrolls(false);
+		//光标初始位置
+		editableDirectory.setSelectionStart(new String("s3://").length());
+		//Margin
+		editableDirectory.setMargin(new Insets(3,0,0,0));
+		
 		
 		//color
 		jmb.setBackground(new Color(0xF2F2F2));
@@ -376,7 +413,8 @@ public class MainFrame extends JFrame implements Runnable{
 				ErrorMessage.showErrorMessage("synchronize local file failed!");
 			}
 		}
-
+		editableDirectory.setText("s3://");
+		editableDirectory.setSelectionStart(new String("s3://").length());
 		currentDirectoryLabel.setText(curDirData.getCurDir());
 		
 		//将currentDirectoryLabel传给buckettree
@@ -390,6 +428,9 @@ public class MainFrame extends JFrame implements Runnable{
 		
 		listObjectInDirectoryData.setCurDirData(curDirData);
 		
+		//directory button 初始化
+		directoryButtons.addOneDirectory("s3");
+		//pathAndSearchPanel.add(editableDirectory);
 		
 	}
 	private class ExitMenuItemListener implements ActionListener{
@@ -513,7 +554,6 @@ public class MainFrame extends JFrame implements Runnable{
 
 		public void mouseReleased(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
 		}
 		
 	}
