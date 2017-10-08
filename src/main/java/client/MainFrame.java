@@ -126,15 +126,12 @@ public class MainFrame extends JFrame implements Runnable{
 	private JButton
 		backButton = new JButton(""),
 		forwardButton = new JButton(""),
+		
 		uploadButton = new JButton("Upload"),
 		newFolderButton = new JButton("NewFolder"),
 		downloadButton = new JButton("Download"),
 		deleteButton = new JButton("Delete"), 
 		freshButton = new JButton("Fresh");
-	
-	//目录
-	private Border border = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(0xA9A9A9));
-	private JTextField editableDirectory = new JTextField();
 	
 	
 	//task is useless,just for init
@@ -155,7 +152,13 @@ public class MainFrame extends JFrame implements Runnable{
 	//只有账户正确时，才可以将isSynDirok设为true
 	private boolean isAccountOk = false;
 	
+	//目录
 	private DirectoryButtons directoryButtons = new DirectoryButtons(pathAndSearchPanel);
+	private EditableDirectory editableDirectory = new EditableDirectory(pathAndSearchPanel); 
+	//搜索
+	private SearchField searchField = new SearchField(pathAndSearchPanel);
+	
+	//shortcut panel,觉得很丑，暂时不要
 	
 	public MainFrame(CountDownLatch latch,CurDirData curDirData,
 			ListObjectInDirectoryData listObjectInDirectoryData, ObjectTable objectTable
@@ -246,9 +249,7 @@ public class MainFrame extends JFrame implements Runnable{
 				Math.round(32*widthFactor), Math.round(32*heightFactor));
 		//directory button
 		directoryButtons.setBound(sw);
-		
-		editableDirectory.setBounds(Math.round(85*widthFactor), Math.round(9*heightFactor),
-				sw*3/5,  Math.round(32*heightFactor));
+		editableDirectory.setBound(sw);
 		
 		mainPanel.setBounds(0, Math.round(50*heightFactor), sw, sh);
 		
@@ -263,12 +264,9 @@ public class MainFrame extends JFrame implements Runnable{
 		freshButton.setBounds(sw/5+10+140+140+140+140, sh/8*5-50+10, 130, 28);
 		
 		tabbedPane.setBounds(0,sh/8*5,sw-20,sh/8*3-110);
-		
 		//
-		
 		bucketTreeScrollPane.updateUI();
 		objectTableScrollPane.updateUI();
-		
 		
 	}
 	class MainFrameComponentListener implements ComponentListener{
@@ -345,25 +343,26 @@ public class MainFrame extends JFrame implements Runnable{
 		freshButton.setFocusable(false);
 		backButton.setFocusable(false);
 		forwardButton.setFocusable(false);
+		pathAndSearchPanel.setFocusable(true);
 		
 		
 		//border
 		Border border1 = BorderFactory.createMatteBorder(1, 0, 1, 0, new Color(0xA9A9A9));
 		pathAndSearchPanel.setBorder(border1);
 		Border border2 = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(0xA9A9A9));
-		editableDirectory.setBorder(border2);
-		editableDirectory.setFont(new Font("TimesRoman", Font.PLAIN, (int) Math.floor(19*ScreenInfo.getHeightFactor())));
+		//editableDirectory.setBorder(border2);
+		//editableDirectory.setFont(new Font("TimesRoman", Font.PLAIN, (int) Math.floor(19*ScreenInfo.getHeightFactor())));
 		
 		
 		backButton.setBorderPainted(false);
 		forwardButton.setBorderPainted(false);
 		
 		//scroll bar
-		editableDirectory.setAutoscrolls(false);
+		//editableDirectory.setAutoscrolls(false);
 		//光标初始位置
-		editableDirectory.setSelectionStart(new String("s3://").length());
+		//editableDirectory.setSelectionStart(new String("s3://").length());
 		//Margin
-		editableDirectory.setMargin(new Insets(3,0,0,0));
+		//editableDirectory.setMargin(new Insets(3,0,0,0));
 		
 		
 		//color
@@ -413,9 +412,9 @@ public class MainFrame extends JFrame implements Runnable{
 				ErrorMessage.showErrorMessage("synchronize local file failed!");
 			}
 		}
-		editableDirectory.setText("s3://");
-		editableDirectory.setSelectionStart(new String("s3://").length());
-		currentDirectoryLabel.setText(curDirData.getCurDir());
+		//editableDirectory.setText("s3://");
+		//editableDirectory.setSelectionStart(new String("s3://").length());
+		//currentDirectoryLabel.setText(curDirData.getCurDir());
 		
 		//将currentDirectoryLabel传给buckettree
 		bucketTree.setCurrentDirectoryLabel(currentDirectoryLabel);
@@ -428,9 +427,11 @@ public class MainFrame extends JFrame implements Runnable{
 		
 		listObjectInDirectoryData.setCurDirData(curDirData);
 		
-		//directory button 初始化
-		directoryButtons.addOneDirectory("s3");
-		//pathAndSearchPanel.add(editableDirectory);
+		//目录
+		directoryButtons.addOneDirectory("s3://");
+		directoryButtons.setEditableDirectory(editableDirectory);
+		editableDirectory.setCurDirDate(curDirData);
+		editableDirectory.setDirectoryButtons(directoryButtons);
 		
 	}
 	private class ExitMenuItemListener implements ActionListener{
